@@ -54,7 +54,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .v .nt{font-size:.6em;vertical-align:.5em;color:var(--acc);margin-left:.15em}
 /* iPhone mở từ màn hình chính: kéo thanh dưới xuống sát vạch Home, bỏ khoảng trống thừa */
 html.iosapp,html.iosapp body{background:var(--page)}
-html.iosapp #app{bottom:auto;height:var(--fullH,100lvh);background:var(--page);padding-bottom:max(calc(env(safe-area-inset-bottom,0px) - 24px),10px)}
+html.iosapp #app{background:var(--page);padding-bottom:max(calc(env(safe-area-inset-bottom,0px) - 24px),10px)}
 html.iosapp #status{background:var(--page)}
 html.iosapp .sheet:not(.on){box-shadow:none}
 html.iosapp #status,html.iosapp #status button{height:30px}
@@ -913,10 +913,11 @@ if(!NATIVE){
   $('#bExport').textContent='Sao chép dữ liệu';
   /* Xin trình duyệt giữ dữ liệu lâu dài; cài service worker để đọc khi không có mạng */
   if(navigator.standalone||matchMedia('(display-mode: standalone)').matches){document.documentElement.classList.add('iosapp');
-    /* iOS đôi khi báo chiều cao thiếu đúng bằng thanh trạng thái: lấy chiều cao thật của màn hình */
-    const fitH=()=>{const land=innerWidth>innerHeight,h=land?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height);
-      document.documentElement.style.setProperty('--fullH',Math.max(h,innerHeight)+'px')};
-    fitH();addEventListener('resize',fitH);addEventListener('orientationchange',()=>setTimeout(fitH,300))}
+    /* Số đo màn hình để chẩn đoán lỗi chiều cao trên iPhone (hiện ở cuối bảng Hiển thị) */
+    const dbg=document.createElement('div');dbg.style.cssText='font-size:11px;color:var(--mute);margin-top:6px';$('#fImport').before(dbg);
+    $('#bSet').addEventListener('click',()=>{const c=document.createElement('div');c.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top);bottom:auto;width:1px';document.body.append(c);const t=c.offsetHeight;
+      c.style.height='env(safe-area-inset-bottom)';const bt=c.offsetHeight;c.style.height='100lvh';const lv=c.offsetHeight;c.remove();
+      dbg.textContent='đo: '+innerHeight+'/'+screen.height+'/'+lv+' · '+t+'/'+bt+' · '+Math.round($('#status').getBoundingClientRect().bottom)});}
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 }

@@ -76,7 +76,10 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 .ph{display:flex;align-items:center;gap:6px;padding:8px 8px 4px;min-height:60px}
 .ph h2{margin:0;font-size:24px;font-weight:600;flex:1}
 .tabs{display:flex;gap:6px;padding:4px 16px 10px}
-.tab{height:38px;padding:0 16px;border-radius:19px;background:var(--ui2);font-size:15px}
+.about{padding:4px 18px 24px;line-height:1.55;font-size:15px}.about h3{font-size:22px;margin:6px 0 2px;font-family:var(--serif,serif)}
+.about .ver{color:var(--acc);font-weight:600;margin:0 0 14px}.about dl{margin:0}.about dt{font-size:12px;color:var(--mute);margin:12px 0 2px;text-transform:uppercase;letter-spacing:.04em}
+.about dd{margin:0}.about small{color:var(--mute)}
+.tab{height:38px;padding:0 13px;border-radius:19px;background:var(--ui2);font-size:15px}
 .tab.on{background:var(--uiInk);color:var(--ui)}
 .pb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px}
 .sec{padding:14px 20px 6px;font-size:13px;color:var(--mute);font-weight:600}
@@ -100,6 +103,7 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 .mkT sup{font-size:.62em;color:var(--mute);margin-right:2px}
 .mkN{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;font-size:14px;color:var(--mute);font-style:italic}
 .tabs{overflow-x:auto}.tab{white-space:nowrap}
+#pToc .tab{flex:1 1 0;padding:0 4px;font-size:14px;overflow:visible}
 .empty{padding:30px 20px;color:var(--mute);text-align:center}
 /* search */
 .sbox{display:flex;gap:8px;padding:0 16px 10px}
@@ -208,7 +212,7 @@ html.full #app{padding-top:0;padding-bottom:0}
   <!-- Mục lục -->
   <section class="panel" id="pToc">
     <div class="ph"><button class="ib" data-close aria-label="Quay lại"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><h2>Mục lục</h2></div>
-    <div class="tabs"><button class="tab on" data-tab="books">Các sách</button><button class="tab" data-tab="marks">Đánh dấu</button><button class="tab" data-tab="hist">Lịch sử</button></div>
+    <div class="tabs"><button class="tab on" data-tab="books">Các sách</button><button class="tab" data-tab="marks">Đánh dấu</button><button class="tab" data-tab="hist">Lịch sử</button><button class="tab" data-tab="about">Giới thiệu</button></div>
     <div class="pb" id="tocBody"></div>
     <div class="recent" id="tocRecent"></div>
   </section>
@@ -271,7 +275,7 @@ let B=[], chList=[];                     // B[b]=[name,id,chapters]; chList = fl
 const set=Object.assign({t:'brown',fs:21,lh:1.6,per:0,rate:1,full:0,voice:''},store.get('set',{}));
 const CAP=window.capacitorExports, NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const P=n=>NATIVE&&CAP?CAP.registerPlugin(n):null;
-const TTS=P('TextToSpeech'), AppP=P('App'), FS=P('Filesystem'), ShareP=P('Share');
+const TTS=P('TextToSpeech'), RA=P('ReadAloud'), AppP=P('App'), FS=P('Filesystem'), ShareP=P('Share');
 let pos=store.get('pos',{b:39,c:4,v:1});  // mặc định Ma-thi-ơ 5
 let hl=store.get('hl',{});               // "b.c.v" -> {c:'hy',n:'...',t:thời điểm sửa}
 let tomb=store.get('tomb',{});           // "b.c.v" -> thời điểm xóa (để đồng bộ việc xóa sang máy khác)
@@ -513,6 +517,8 @@ function renderToc(){
       (i===openBook?`<div class="grid">${bk[2].map((_,c)=>`<button class="${i===pos.b&&c===pos.c?'cur':''}" data-b="${i}" data-c="${c}">${c+1}</button>`).join('')}</div>`:'')).join('');
     $('#tocRecent').style.display='';
     $('#tocRecent').innerHTML=`<h3>Gần đây</h3><div class="cards">${hist.slice(0,10).map(h=>`<button class="card" data-b="${h.b}" data-c="${h.c}" data-v="${h.v}"><b>${esc(ref(h.b,h.c,h.v))}</b><small>${ago(h.t)}</small></button>`).join('')||'<div class="empty">Chưa có</div>'}</div>`;
+  }else if(tocTab==='about'){
+    $('#tocRecent').style.display='none';renderAbout();
   }else if(tocTab==='marks'){
     $('#tocRecent').style.display='none';renderMarks();
   }else{
@@ -626,7 +632,7 @@ async function loadVoices(){
   if(VOICES)return VOICES;
   try{
     if(TTS){const all=(await TTS.getSupportedVoices()).voices||[];
-      VOICES=all.map((v,i)=>({i,name:v.name||v.voiceURI||('voice'+i),lang:v.lang||'',local:v.localService!==false})).filter(v=>/^vi/i.test(v.lang))}
+      VOICES=all.map((v,i)=>({i,uri:v.voiceURI||'',name:v.name||v.voiceURI||('voice'+i),lang:v.lang||'',local:v.localService!==false})).filter(v=>/^vi/i.test(v.lang))}
     else if('speechSynthesis' in window)VOICES=webVoices();
   }catch(e){VOICES=[]}
   if(!VOICES||!VOICES.length){const v=VOICES;VOICES=null;return v||[]}
@@ -671,7 +677,7 @@ async function ttsStartNative(b,c,v){
   await loadVoices();
   ttsHalt();tts={b,c,v,paused:false,run:Date.now()};$('#ttsBar').classList.add('on');$('#bar').classList.remove('on');ttsIcon();sayNext();
 }
-function ttsHalt(){try{if(TTS)TTS.stop();else speechSynthesis.cancel()}catch(e){}}
+function ttsHalt(){try{if(RA)RA.stop();if(TTS)TTS.stop();else speechSynthesis.cancel()}catch(e){}}
 function ttsIcon(){$('#ttsIco').innerHTML=tts&&tts.paused?'<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>':'<svg viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg>'}
 function showVerse(b,c,v){ // đưa trang chứa câu đang đọc lên màn hình
   if(b!==pos.b||c!==pos.c){build(b,c,{v});return}
@@ -679,7 +685,27 @@ function showVerse(b,c,v){ // đưa trang chứa câu đang đọc lên màn hì
   if(target===idx)return;
   if(target===idx+1&&!anim&&!drag)turn(1);else if(!anim&&!drag){idx=target;showIdle();afterMove()}
 }
+/* APK: giao việc đọc cho dịch vụ chạy nền (ReadAloud), dịch vụ tự chuyển câu/chương kể cả khi tắt màn hình.
+   Giao diện chỉ nhận sự kiện "progress" để lật trang và tô câu đang đọc. */
+function raShow(b,c,v){
+  if(!tts||tts.paused)return;Object.assign(tts,{b,c,v});
+  if(document.hidden)return; // màn hình tắt: khỏi dàn trang, lúc mở lại sẽ cập nhật
+  showVerse(b,c,v);sayK=b+'.'+c+'.'+v;$$('.v.say').forEach(e=>e.classList.remove('say'));$$(`.v[data-k="${sayK}"]`).forEach(e=>e.classList.add('say'));
+  $('#ttsRef').textContent='Đang đọc '+ref(b,c,v);
+}
+if(RA){
+  RA.addListener('progress',d=>raShow(d.b,d.c,d.v));
+  RA.addListener('end',()=>{if(tts&&!tts.paused)ttsStop()});
+  RA.addListener('error',d=>toast(d.message||'Lỗi giọng đọc'));
+  const raSync=()=>{if(!tts||tts.paused)return;RA.state().then(s=>{if(!tts||tts.paused)return;
+    if(s.playing&&s.b>=0)raShow(s.b,s.c,s.v);else ttsStop()}).catch(()=>{})};
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(raSync,300)});
+  if(AppP)AppP.addListener('resume',()=>setTimeout(raSync,300));
+}
 function sayNext(){
+  if(RA&&tts&&!tts.paused){const v=curVoice();
+    RA.play({b:tts.b,c:tts.c,v:tts.v,rate:set.rate,voice:(v&&v.uri)||''}).catch(e=>toast(String(e&&e.message||e)));
+    raShow(tts.b,tts.c,tts.v);return}
   if(!tts||tts.paused)return;let {b,c,v}=tts;const run=tts.run;
   if(v>B[b][2][c].length){const i=chIdx(b,c)+1;if(i>=chList.length)return ttsStop();[b,c]=chList[i];v=1;Object.assign(tts,{b,c,v})}
   showVerse(b,c,v);
@@ -688,7 +714,7 @@ function sayNext(){
   if(!vtext(b,c,v)){tts.v++;return sayNext()}
   speakText(vtext(b,c,v)).then(()=>{if(tts&&tts.run===run&&!tts.paused){tts.v++;sayNext()}},()=>{});
 }
-function ttsGo(b,c,v){if(!tts)return;ttsHalt();Object.assign(tts,{b,c,v,paused:false,run:Date.now()});ttsIcon();if(TTS)sayNext();else setTimeout(sayNext,120)}
+function ttsGo(b,c,v){if(!tts)return;if(!RA)ttsHalt();Object.assign(tts,{b,c,v,paused:false,run:Date.now()});ttsIcon();if(TTS)sayNext();else setTimeout(sayNext,120)}
 function ttsStop(){tts=null;sayK=null;ttsHalt();$('#ttsBar').classList.remove('on');$$('.v.say').forEach(e=>e.classList.remove('say'))}
 $('#bTts').onclick=()=>ttsStart(pos.b,pos.c,pos.v);
 $('#ttsStop').onclick=ttsStop;
@@ -883,6 +909,25 @@ document.addEventListener('visibilitychange',()=>{if(!acct.uid||!acOK())return;
   if(document.visibilityState==='hidden'){clearTimeout(acT);acctSync(false)}else acctSync(false,true)});
 renderAcct();
 
+/* ---------- Tab Giới thiệu: phiên bản, nguồn văn bản, người phát triển ---------- */
+let APPVER=null;
+async function renderAbout(){
+  if(!APPVER){try{if(AppP){const i=await AppP.getInfo();APPVER='Phiên bản '+i.version+' (bản cài Android, build '+i.build+')'}}catch(e){}
+    if(!APPVER)APPVER='Bản web (mở bằng trình duyệt), cập nhật '+WEB_UPDATED}
+  if(tocTab!=='about')return;
+  const nHl=Object.keys(hl).length;
+  $('#tocBody').innerHTML=`<div class="about">
+    <h3>Kinh Thánh 1925</h3><p class="ver">${esc(APPVER)}</p>
+    <dl>
+      <dt>Phát triển</dt><dd>David<br><small>Viết mã cùng trợ lý AI Claude (Anthropic)</small></dd>
+      <dt>Văn bản</dt><dd>Kinh Thánh bản Truyền Thống 1925 (Vietnamese Bible 1925)<br><small>Thánh Kinh Hội (Bible Society Vietnam). Thuộc phạm vi công cộng. Dữ liệu lấy từ YouVersion (bible.com), mã bản dịch VIE1925.</small></dd>
+      <dt>Phông chữ</dt><dd>Noto Serif và Be Vietnam Pro<br><small>Giấy phép SIL Open Font License</small></dd>
+      <dt>Dữ liệu của bạn</dt><dd>${nHl} câu đã tô màu/ghi chú, ${hist.length} chương trong lịch sử đọc.<br><small>${NATIVE?'Lưu trên máy; có thể đồng bộ Google Drive trong Cài đặt.':'Lưu trên máy; đăng nhập tài khoản trong Cài đặt để lưu lên mạng.'}</small></dd>
+      <dt>Tính năng</dt><dd><small>Lật trang cong giấy · tô 4 màu và ghi chú · tìm kiếm có dấu/không dấu · đọc thành tiếng (chạy nền trên Android) · 3 nền màu · lịch sử đọc · sao lưu, đồng bộ.</small></dd>
+    </dl></div>`;
+}
+const WEB_UPDATED='23/11/2026';
+
 /* ---------- Nút Back của Android ---------- */
 if(AppP)AppP.addListener('backButton',()=>{
   if($('.panel.on')){closeAll();return}
@@ -891,7 +936,8 @@ if(AppP)AppP.addListener('backButton',()=>{
   if($('#bar').classList.contains('on')){$('#bar').classList.remove('on');return}
   AppP.minimizeApp();
 });
-if(AppP)AppP.addListener('pause',()=>{if(tts&&!tts.paused){tts.paused=true;ttsHalt()}});
+/* Bản APK đọc bằng dịch vụ chạy nền nên KHÔNG dừng khi app xuống nền hay tắt màn hình */
+if(AppP&&!RA)AppP.addListener('pause',()=>{if(tts&&!tts.paused){tts.paused=true;ttsHalt()}});
 
 /* Nút phản hồi ngay khi nhấc tay (không chờ click, không bị trình duyệt nuốt sau cú vuốt) */
 {let bd=null;

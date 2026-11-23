@@ -58,6 +58,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 html.iosapp,html.iosapp body{background:var(--page)}
 html.iosapp #app{background:var(--page);padding-bottom:max(calc(env(safe-area-inset-bottom,0px) - 24px),10px)}
 html.iosapp #status{background:var(--page)}
+/* iPhone mở từ màn hình chính: thanh trạng thái luôn hiện và iOS phủ một dải mờ dưới nó, nên chừa vùng an toàn + 10px */
+html.iosapp #app,html.iosapp.full #app{padding-top:calc(max(env(safe-area-inset-top,0px),20px) + 10px)}
 html.iosapp .sheet:not(.on){box-shadow:none}
 html.iosapp #status,html.iosapp #status button{height:30px}
 #status{height:40px;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:13px;color:var(--mute);background:var(--bg)}
@@ -1003,11 +1005,14 @@ let refullT=0;const refull=()=>{if(!set.full)return;clearTimeout(refullT);refull
 new MutationObserver(ms=>{if(ms.some(m=>m.oldValue&&/\bon\b/.test(m.oldValue)&&!m.target.classList.contains('on')))refull()})
   .observe($('#app'),{subtree:true,attributes:true,attributeFilter:['class'],attributeOldValue:true});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refull()});
+// iPhone không cho trang web ẩn thanh trạng thái: bỏ tùy chọn toàn màn hình để không mất chỗ cho nút Quay lại
+const CANFULL=NATIVE||!!document.documentElement.requestFullscreen;
+if(!CANFULL){$('#rowFull').style.display='none';$('#bFull').style.display='none'}
 function applyFull(){
   try{if(NATIVE&&CAP&&CAP.SystemBars){set.full?CAP.SystemBars.hide():CAP.SystemBars.show()}
       else if(set.full&&!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
       else if(!set.full&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}
-  document.documentElement.classList.toggle('full',!!set.full);
+  document.documentElement.classList.toggle('full',!!set.full&&CANFULL);
 }
 $('#segFull').onclick=e=>{const x=e.target.closest('[data-v]');if(!x)return;set.full=+x.dataset.v;applySettings();applyFull()};
 $('#bFull').onclick=()=>{set.full=set.full?0:1;applySettings();applyFull();$('#bar').classList.remove('on');toast(set.full?'Đã bật toàn màn hình':'Đã tắt toàn màn hình')};

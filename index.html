@@ -79,7 +79,7 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 .about{padding:4px 18px 24px;line-height:1.55;font-size:15px}.about h3{font-size:22px;margin:6px 0 2px;font-family:var(--serif,serif)}
 .about .ver{color:var(--acc);font-weight:600;margin:0 0 14px}.about dl{margin:0}.about dt{font-size:12px;color:var(--mute);margin:12px 0 2px;text-transform:uppercase;letter-spacing:.04em}
 .about dd{margin:0}.about small{color:var(--mute)}
-.tab{height:38px;padding:0 13px;border-radius:19px;background:var(--ui2);font-size:15px}
+.tab{height:38px;padding:0 13px;border-radius:8px;background:var(--ui2);font-size:15px}
 .tab.on{background:var(--uiInk);color:var(--ui)}
 .pb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px}
 .sec{padding:14px 20px 6px;font-size:13px;color:var(--mute);font-weight:600}
@@ -103,7 +103,11 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 .mkT sup{font-size:.62em;color:var(--mute);margin-right:2px}
 .mkN{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;font-size:14px;color:var(--mute);font-style:italic}
 .tabs{overflow-x:auto}.tab{white-space:nowrap}
-#pToc .tab{flex:1 1 0;padding:0 4px;font-size:14px;overflow:visible}
+/* Tab Mục lục: 4 ô đều nhau, biểu tượng trên chữ dưới, bo góc vừa phải, chữ không bao giờ tràn */
+.tocTabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;overflow:visible!important}
+.tocTabs .tab{height:auto;min-height:54px;padding:6px 2px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-size:12.5px;line-height:1.15;white-space:normal;text-align:center;overflow:hidden}
+.tocTabs .tab svg{width:21px;height:21px;flex:none}.tocTabs .tab span{display:block;max-width:100%;overflow-wrap:anywhere}
 .empty{padding:30px 20px;color:var(--mute);text-align:center}
 /* search */
 .sbox{display:flex;gap:8px;padding:0 16px 10px}
@@ -212,7 +216,7 @@ html.full #app{padding-top:0;padding-bottom:0}
   <!-- Mục lục -->
   <section class="panel" id="pToc">
     <div class="ph"><button class="ib" data-close aria-label="Quay lại"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><h2>Mục lục</h2></div>
-    <div class="tabs"><button class="tab on" data-tab="books">Các sách</button><button class="tab" data-tab="marks">Đánh dấu</button><button class="tab" data-tab="hist">Lịch sử</button><button class="tab" data-tab="about">Giới thiệu</button></div>
+    <div class="tabs tocTabs"><button class="tab on" data-tab="books"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z"/><path d="M4 20.5A2.5 2.5 0 016.5 18H20v3H6.5A2.5 2.5 0 014 20.5"/></svg><span>Các sách</span></button><button class="tab" data-tab="marks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg><span>Đánh dấu</span></button><button class="tab" data-tab="hist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Lịch sử</span></button><button class="tab" data-tab="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.5v.01"/></svg><span>Giới thiệu</span></button></div>
     <div class="pb" id="tocBody"></div>
     <div class="recent" id="tocRecent"></div>
   </section>
@@ -687,20 +691,27 @@ function showVerse(b,c,v){ // đưa trang chứa câu đang đọc lên màn hì
 }
 /* APK: giao việc đọc cho dịch vụ chạy nền (ReadAloud), dịch vụ tự chuyển câu/chương kể cả khi tắt màn hình.
    Giao diện chỉ nhận sự kiện "progress" để lật trang và tô câu đang đọc. */
-function raShow(b,c,v){
-  if(!tts||tts.paused)return;Object.assign(tts,{b,c,v});
+function raShow(b,c,v,force){
+  if(!tts||(tts.paused&&!force))return;Object.assign(tts,{b,c,v});
   if(document.hidden)return; // màn hình tắt: khỏi dàn trang, lúc mở lại sẽ cập nhật
   showVerse(b,c,v);sayK=b+'.'+c+'.'+v;$$('.v.say').forEach(e=>e.classList.remove('say'));$$(`.v[data-k="${sayK}"]`).forEach(e=>e.classList.add('say'));
   $('#ttsRef').textContent='Đang đọc '+ref(b,c,v);
 }
 if(RA){
   RA.addListener('progress',d=>raShow(d.b,d.c,d.v));
-  RA.addListener('end',()=>{if(tts&&!tts.paused)ttsStop()});
+  // bấm Phát/Tạm dừng trên thông báo, màn hình khóa hoặc tai nghe
+  RA.addListener('state',d=>{if(!tts)return;tts.paused=!!d.paused;ttsIcon()});
+  RA.addListener('end',()=>{if(tts)ttsStop()});
   RA.addListener('error',d=>toast(d.message||'Lỗi giọng đọc'));
-  const raSync=()=>{if(!tts||tts.paused)return;RA.state().then(s=>{if(!tts||tts.paused)return;
-    if(s.playing&&s.b>=0)raShow(s.b,s.c,s.v);else ttsStop()}).catch(()=>{})};
+  const raSync=()=>{if(!B.length){setTimeout(raSync,800);return}RA.state().then(s=>{
+    if(s.playing||s.paused){
+      if(!tts){tts={b:s.b,c:s.c,v:s.v,paused:false,run:Date.now()};$('#ttsBar').classList.add('on')}
+      tts.paused=!!s.paused;ttsIcon();if(s.b>=0)raShow(s.b,s.c,s.v,true);
+    }else if(tts)ttsStop();
+  }).catch(()=>{})};
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(raSync,300)});
   if(AppP)AppP.addListener('resume',()=>setTimeout(raSync,300));
+  setTimeout(raSync,1500); // mở lại app khi dịch vụ vẫn đang đọc
 }
 function sayNext(){
   if(RA&&tts&&!tts.paused){const v=curVoice();
@@ -719,6 +730,7 @@ function ttsStop(){tts=null;sayK=null;ttsHalt();$('#ttsBar').classList.remove('o
 $('#bTts').onclick=()=>ttsStart(pos.b,pos.c,pos.v);
 $('#ttsStop').onclick=ttsStop;
 $('#ttsPause').onclick=()=>{if(!tts)return;   // tạm dừng = dừng câu đang đọc; tiếp tục = đọc lại từ đầu câu đó
+  if(RA){tts.paused=!tts.paused;ttsIcon();(tts.paused?RA.pause():RA.resume()).catch(()=>{});return}
   if(tts.paused){tts.paused=false;tts.run=Date.now();ttsIcon();sayNext()}else{tts.paused=true;ttsHalt();ttsIcon()}};
 $('#ttsPrevV').onclick=()=>{if(!tts)return;let {b,c,v}=tts;if(v>1)v--;else{const i=chIdx(b,c)-1;if(i<0)return;[b,c]=chList[i];v=B[b][2][c].length}ttsGo(b,c,v)};
 $('#ttsNextV').onclick=()=>{if(!tts)return;ttsGo(tts.b,tts.c,tts.v+1)};

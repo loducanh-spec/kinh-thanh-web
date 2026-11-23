@@ -647,7 +647,7 @@ async function loadVoices(){
   if(VOICES)return VOICES;
   try{
     if(TTS){const all=(await TTS.getSupportedVoices()).voices||[];
-      VOICES=all.map((v,i)=>({i,uri:v.voiceURI||'',name:v.name||v.voiceURI||('voice'+i),lang:v.lang||'',local:v.localService!==false})).filter(v=>/^vi/i.test(v.lang))}
+      VOICES=all.map((v,i)=>({i,uri:v.voiceURI||'',name:v.voiceURI||v.name||('voice'+i),lang:v.lang||'',local:v.localService!==false})).filter(v=>/^vi/i.test(v.lang))}
     else if('speechSynthesis' in window)VOICES=webVoices();
   }catch(e){VOICES=[]}
   if(!VOICES||!VOICES.length){const v=VOICES;VOICES=null;return v||[]}

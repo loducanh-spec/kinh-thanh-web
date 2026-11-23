@@ -667,7 +667,13 @@ async function renderVoices(){
     :'Chưa thấy giọng tiếng Việt. Vào Cài đặt điện thoại > Chuyển văn bản thành giọng nói > Google > Cài đặt dữ liệu giọng nói > Tiếng Việt để tải thêm giọng.';
 }
 function curVoice(){return VOICES?VOICES.find(v=>v.name===set.voice):null}
+// Chuẩn hóa câu trước khi đọc (giống ReadAloudService.spoken): Jêsus → Giê-xu; bỏ gạch nối giữa âm tiết;
+// chữ hoa đứng một mình (Y, A, Ê…) viết thường để máy không đánh vần thành tên chữ cái; không đọc dấu ngoặc.
+const spoken=t=>t.replace(/Jêsus/g,'Giê-xu').replace(/(\p{L})-(?=\p{L})/gu,'$1 ').replace(/-/g,' ')
+  .replace(/[()]/g,', ').replace(/[\[\]"“”]/g,' ').replace(/(^|[^\p{L}])(\p{Lu})(?!\p{L})/gu,(m,a,c)=>a+c.toLowerCase())
+  .replace(/\s+/g,' ').replace(/ ,/g,',').replace(/,(\s*,)+/g,',').trim();
 function speakText(text){ // trả về Promise kết thúc khi đọc xong câu
+  text=spoken(text);
   const v=curVoice();
   if(TTS){const o={text,lang:'vi-VN',rate:set.rate,pitch:1,volume:1,category:'playback'};if(v)o.voice=v.i;return TTS.speak(o)}
   return new Promise((res,rej)=>{const u=new SpeechSynthesisUtterance(text);const vo=v&&v.ref||pickVoice();

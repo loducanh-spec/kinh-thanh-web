@@ -67,7 +67,9 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 #bar{position:absolute;inset:0;z-index:10;pointer-events:none;opacity:0;transition:opacity .18s}
 #bar.on{opacity:1}#bar.on>*{pointer-events:auto}
 .top,.bot{position:absolute;left:0;right:0;background:var(--ui);color:var(--uiInk);display:flex;align-items:center;gap:4px;padding:8px 10px;box-shadow:0 0 18px rgba(0,0,0,.35)}
-.top{top:0}.bot{bottom:0}
+.top{top:0;padding-top:calc(10px + var(--sbh,0px))}.bot{bottom:0}
+html.full{--sbh:30px}
+html.full .panel{padding-top:var(--sbh)}
 .ib{width:46px;height:46px;border-radius:23px;display:grid;place-items:center}
 .ib svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pill{flex:1;height:46px;border-radius:23px;background:var(--ui2);font-weight:600;font-size:18px;display:flex;align-items:center;justify-content:space-between;padding:0 6px}
@@ -990,6 +992,11 @@ if(!NATIVE){
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
+// Đóng menu, bảng, Mục lục… thì ẩn lại thanh hệ thống nếu đang toàn màn hình (phòng khi thanh đã hiện ra do vuốt)
+let refullT=0;const refull=()=>{if(!set.full)return;clearTimeout(refullT);refullT=setTimeout(applyFull,250)};
+new MutationObserver(ms=>{if(ms.some(m=>m.oldValue&&/\bon\b/.test(m.oldValue)&&!m.target.classList.contains('on')))refull()})
+  .observe($('#app'),{subtree:true,attributes:true,attributeFilter:['class'],attributeOldValue:true});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refull()});
 function applyFull(){
   try{if(NATIVE&&CAP&&CAP.SystemBars){set.full?CAP.SystemBars.hide():CAP.SystemBars.show()}
       else if(set.full&&!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});

@@ -53,7 +53,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @keyframes fl{0%,40%{background:rgba(201,168,90,.55)}100%{background:transparent}}
 .v .nt{font-size:.6em;vertical-align:.5em;color:var(--acc);margin-left:.15em}
 /* iPhone mở từ màn hình chính: kéo thanh dưới xuống sát vạch Home, bỏ khoảng trống thừa */
-html.iosapp #app{padding-bottom:max(calc(env(safe-area-inset-bottom,0px) - 26px),2px)}
+html.iosapp,html.iosapp body{background:var(--page)}
+html.iosapp #app{bottom:auto;height:var(--fullH,100lvh);background:var(--page);padding-bottom:max(calc(env(safe-area-inset-bottom,0px) - 24px),10px)}
+html.iosapp #status{background:var(--page)}
+html.iosapp .sheet:not(.on){box-shadow:none}
 html.iosapp #status,html.iosapp #status button{height:30px}
 #status{height:40px;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:13px;color:var(--mute);background:var(--bg)}
 #status button{height:40px;padding:0 8px;display:flex;align-items:center}#stMenu{color:var(--ink)}#stMid{gap:6px}#stBook{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -909,7 +912,11 @@ if(!NATIVE){
   if(!document.documentElement.requestFullscreen){$('#rowFull').hidden=true;$('#bFull').style.display='none'}
   $('#bExport').textContent='Sao chép dữ liệu';
   /* Xin trình duyệt giữ dữ liệu lâu dài; cài service worker để đọc khi không có mạng */
-  if(navigator.standalone||matchMedia('(display-mode: standalone)').matches)document.documentElement.classList.add('iosapp');
+  if(navigator.standalone||matchMedia('(display-mode: standalone)').matches){document.documentElement.classList.add('iosapp');
+    /* iOS đôi khi báo chiều cao thiếu đúng bằng thanh trạng thái: lấy chiều cao thật của màn hình */
+    const fitH=()=>{const land=innerWidth>innerHeight,h=land?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height);
+      document.documentElement.style.setProperty('--fullH',Math.max(h,innerHeight)+'px')};
+    fitH();addEventListener('resize',fitH);addEventListener('orientationchange',()=>setTimeout(fitH,300))}
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 }

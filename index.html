@@ -117,6 +117,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .btn.pri{background:var(--uiInk);color:var(--ui);font-weight:600}.btn.sm{height:36px;padding:0 16px}
 .seg .btn.on{background:var(--uiInk);color:var(--ui);font-weight:600}
 .val{display:grid;place-items:center;font-size:16px;font-weight:600;border:1px solid var(--line);border-radius:8px}
+.acct input{display:block;width:100%;height:44px;margin:0 0 8px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--ui2);color:var(--uiInk);font-size:16px;font-family:inherit}
+.acct .seg{margin:0 0 8px}.acct a{color:var(--acc);font-size:14px;text-decoration:underline;cursor:pointer}
 .drvSt{font-size:14px;line-height:1.45;margin:0 0 8px;color:var(--uiInk);overflow-wrap:anywhere}
 .vbox{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}
 #voiceSel{height:42px;border-radius:8px;border:1px solid var(--line);background:var(--ui2);color:var(--uiInk);font:15px var(--sans);padding:0 10px;min-width:0}
@@ -223,6 +225,14 @@ html.full #app{padding-top:0;padding-bottom:0}
     <div class="row"><label>Trình bày</label><div class="seg" id="segPer"><button class="btn" data-v="0">Liền đoạn</button><button class="btn" data-v="1">Từng câu</button></div></div>
     <div class="row"><label>Giọng đọc</label><div class="vbox"><select id="voiceSel"></select><button class="gest btn" id="voiceTry">Nghe thử</button></div><div class="vhint" id="voiceHint"></div></div>
     <div class="row"><label>Tốc độ đọc</label><div class="seg" id="segRate"><button class="btn" data-v="0.8">Chậm</button><button class="btn" data-v="1">Vừa</button><button class="btn" data-v="1.2">Nhanh</button></div></div>
+    <div class="row acct" id="rowAcct" hidden><label>Tài khoản (lưu chỗ đọc, tô màu, ghi chú lên mạng)</label>
+      <div id="acStatus" class="drvSt"></div>
+      <div id="acForm"><input id="acEmail" type="email" autocomplete="username" placeholder="Email" inputmode="email" autocapitalize="off">
+        <input id="acPass" type="password" autocomplete="current-password" placeholder="Mật khẩu (ít nhất 6 ký tự)">
+        <div class="seg"><button class="btn pri" id="acIn">Đăng nhập</button><button class="btn" id="acUp">Tạo tài khoản</button></div>
+        <a id="acForgot">Quên mật khẩu?</a></div>
+      <div id="acOn" hidden><div class="seg"><button class="btn pri" id="acSync">Đồng bộ ngay</button><button class="btn" id="acOut">Đăng xuất</button></div></div>
+    </div>
     <div class="row" id="rowDrive"><label>Đồng bộ Google Drive</label><div class="drv"><div id="drvStatus" class="drvSt"></div><div class="seg"><button class="btn pri" id="drvBtn">Kết nối Google Drive</button><button class="btn" id="drvOff" hidden>Ngắt kết nối</button></div></div></div>
     <div class="row"><label>Sao lưu tô màu, ghi chú</label><div class="seg"><button class="btn" id="bExport">Xuất file</button><button class="btn" id="bImport">Nhập file</button></div></div>
     <input type="file" id="fImport" accept="application/json,.json" hidden>
@@ -354,7 +364,7 @@ function settle(){ // sau khi lật: nếu đã sang chương khác thì dựng 
 }
 function afterMove(){
   const w=winOf(idx), ip=idx-w.start;
-  pos.v=firstVerse(w,ip);pos.t=Date.now();store.set('pos',pos);
+  pos.v=firstVerse(w,ip);pos.t=Date.now();store.set('pos',pos);acctSoon();
   $('#stBook').textContent=ref(pos.b,pos.c);$('#bRef').textContent=ref(pos.b,pos.c);
   $('#stPage').textContent=(ip+1)+'/'+w.n;
   $('#stPct').textContent=Math.round(chIdx(pos.b,pos.c)/chList.length*1000)/10+'%';
@@ -725,7 +735,7 @@ function mergeIn(d,usePos){ // trả về số câu thay đổi
   return n;
 }
 function refreshPages(){decorate(pgT);if(pgU.style.display!=='none')decorate(pgU)}
-function syncSoon(){dirty=true;if(!drive.on)return;clearTimeout(syncT);syncT=setTimeout(()=>syncNow(false),3000)}
+function syncSoon(){dirty=true;acctSoon();if(!drive.on)return;clearTimeout(syncT);syncT=setTimeout(()=>syncNow(false),3000)}
 const hhmm=t=>{const d=new Date(t),p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes())+' '+p(d.getDate())+'/'+p(d.getMonth()+1)};
 function renderDrive(msg){
   const st=$('#drvStatus');if(!st)return;
@@ -774,6 +784,99 @@ $('#drvOff').onclick=()=>{drive={on:false,email:'',last:0,err:''};store.set('dri
 $('#bSet').addEventListener('click',()=>renderDrive());
 if(AppP){AppP.addListener('resume',()=>{if(drive.on)syncNow(false)});AppP.addListener('pause',()=>{if(drive.on)syncNow(false)})}
 
+/* ---------- Tài khoản riêng cho bản web (Firebase Auth + Firestore, gọi REST) ----------
+   Mỗi người 1 tài khoản email/mật khẩu; dữ liệu nằm ở users/<uid> (field data = JSON của payload()).
+   Quy tắc Firestore chỉ cho chính chủ đọc/ghi. Điền FB sau khi tạo dự án Firebase. */
+const FB={apiKey:'',projectId:''};
+const pos0=(store.get('pos',{})||{}).t||0; // vị trí đọc trước khi mở app lần này
+let acct=store.get('acct',{uid:'',email:'',refresh:'',idt:'',exp:0,last:0,err:''}), acBusy=false, acT=null, acOutArm=0;
+const acOK=()=>!NATIVE&&FB.apiKey&&FB.projectId;
+const AERR={EMAIL_EXISTS:'Email này đã có tài khoản, hãy bấm Đăng nhập',EMAIL_NOT_FOUND:'Sai email hoặc mật khẩu',INVALID_PASSWORD:'Sai email hoặc mật khẩu',
+  INVALID_LOGIN_CREDENTIALS:'Sai email hoặc mật khẩu',INVALID_EMAIL:'Email không hợp lệ',MISSING_PASSWORD:'Chưa nhập mật khẩu',
+  TOO_MANY_ATTEMPTS_TRY_LATER:'Thử sai quá nhiều lần, hãy đợi ít phút',USER_DISABLED:'Tài khoản đã bị khóa'};
+async function idt(path,body){
+  const r=await fetch('https://identitytoolkit.googleapis.com/v1/'+path+'?key='+FB.apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const c=(j.error&&j.error.message||'HTTP '+r.status).split(' ')[0];throw new Error(c.startsWith('WEAK_PASSWORD')?'Mật khẩu cần ít nhất 6 ký tự':(AERR[c]||c))}
+  return j;
+}
+function acSave(){store.set('acct',acct)}
+async function acToken(){
+  if(acct.idt&&Date.now()<acct.exp-60e3)return acct.idt;
+  const r=await fetch('https://securetoken.googleapis.com/v1/token?key='+FB.apiKey,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(acct.refresh)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const e=new Error('Phiên đăng nhập hết hạn, hãy đăng nhập lại');e.auth=true;throw e}
+  acct.idt=j.id_token;acct.refresh=j.refresh_token;acct.exp=Date.now()+(+j.expires_in||3600)*1000;acSave();return acct.idt;
+}
+const acURL=()=>'https://firestore.googleapis.com/v1/projects/'+FB.projectId+'/databases/(default)/documents/users/'+acct.uid;
+function renderAcct(msg){
+  if(!$('#rowAcct'))return;
+  $('#rowAcct').hidden=NATIVE;if(NATIVE)return;
+  const on=!!acct.uid;$('#acForm').hidden=on;$('#acOn').hidden=!on;
+  $('#acStatus').textContent=msg||(!acOK()?'Chưa cấu hình máy chủ tài khoản.':on?'Đang dùng: '+acct.email+(acct.last?' · đồng bộ lúc '+hhmm(acct.last):'')+(acct.err?' · '+acct.err:''):
+    'Mỗi người một tài khoản riêng. Chưa đăng nhập thì dữ liệu chỉ nằm trên máy này.');
+  $('#acOut').textContent='Đăng xuất';acOutArm=0;
+}
+function acctSoon(){if(!acOK()||!acct.uid)return;clearTimeout(acT);acT=setTimeout(()=>acctSync(false),4000)}
+async function acctSync(interactive,usePos){
+  if(!acOK()||!acct.uid||acBusy)return;acBusy=true;if(interactive)renderAcct('Đang đồng bộ…');
+  try{
+    const tk=await acToken();const H={Authorization:'Bearer '+tk};
+    let r=await fetch(acURL(),{headers:H}),remote=null;
+    if(r.ok){const j=await r.json();const v=j.fields&&j.fields.data&&j.fields.data.stringValue;if(v)remote=JSON.parse(v)}
+    else if(r.status!==404)throw new Error('Máy chủ báo lỗi '+r.status);
+    if(remote){
+      /* force: vừa đăng nhập; boot: vừa mở app (vị trí trên máy bị ghi giờ lúc mở, nên so với giờ trước khi mở) */
+      if(remote.pos&&(usePos==='force'||(usePos==='boot'&&(remote.pos.t||0)>pos0)))remote=Object.assign({},remote,{pos:Object.assign({},remote.pos,{t:Date.now()+1})});
+      const n=mergeIn(remote,!!(usePos||interactive));if(n)refreshPages()}
+    const body=JSON.stringify(payload());
+    const rb=remote?JSON.stringify({app:remote.app,ver:remote.ver,hl:remote.hl,tomb:remote.tomb,hist:remote.hist,searches:remote.searches,pos:remote.pos}):'';
+    if(body!==rb){
+      r=await fetch(acURL(),{method:'PATCH',keepalive:body.length<60000,headers:Object.assign({'Content-Type':'application/json'},H),
+        body:JSON.stringify({fields:{data:{stringValue:body},t:{integerValue:String(Date.now())}}})});
+      if(!r.ok)throw new Error('Không lưu được ('+r.status+')');
+    }
+    acct.last=Date.now();acct.err='';if(interactive)toast('Đã đồng bộ tài khoản');
+  }catch(e){
+    const m=String(e&&e.message||e);
+    acct.err=/Failed to fetch|NetworkError|Load failed|network/i.test(m)?'chưa đồng bộ được (mất mạng?), sẽ thử lại':m.slice(0,140);
+    if(e.auth){acct.idt='';acct.refresh=''}
+    if(interactive)toast(acct.err);
+  }finally{acBusy=false;acSave();renderAcct()}
+}
+function acClearLocal(){
+  hl={};tomb={};hist=[];searches=[];['hl','tomb','hist','searches'].forEach(k=>store.set(k,k==='hist'||k==='searches'?[]:{}));
+}
+async function acLogin(up){
+  if(!acOK()){toast('Chưa cấu hình máy chủ tài khoản');return}
+  const email=$('#acEmail').value.trim(),password=$('#acPass').value;
+  if(!email||!password){toast('Nhập email và mật khẩu');return}
+  renderAcct(up?'Đang tạo tài khoản…':'Đang đăng nhập…');
+  try{
+    const j=await idt(up?'accounts:signUp':'accounts:signInWithPassword',{email,password,returnSecureToken:true});
+    acct={uid:j.localId,email:j.email||email,refresh:j.refreshToken,idt:j.idToken,exp:Date.now()+(+j.expiresIn||3600)*1000,last:0,err:''};acSave();
+    $('#acPass').value='';
+    await acctSync(false,'force');
+    toast(up?'Đã tạo tài khoản. Dữ liệu trên máy này đã được lưu vào tài khoản.':'Đã đăng nhập: '+acct.email);
+  }catch(e){renderAcct();toast(e.message)}
+}
+$('#acIn').onclick=()=>acLogin(false);
+$('#acUp').onclick=()=>acLogin(true);
+$('#acForgot').onclick=async()=>{
+  const email=$('#acEmail').value.trim();if(!email){toast('Nhập email trước, rồi bấm Quên mật khẩu');return}
+  try{await idt('accounts:sendOobCode',{requestType:'PASSWORD_RESET',email});toast('Đã gửi thư đặt lại mật khẩu tới '+email+' (xem cả mục Spam)')}catch(e){toast(e.message)}};
+$('#acSync').onclick=()=>acctSync(true,true);
+$('#acOut').onclick=async()=>{
+  if(!acOutArm){acOutArm=1;$('#acOut').textContent='Bấm lần nữa để đăng xuất';setTimeout(()=>{if(acOutArm)renderAcct()},4000);return}
+  await acctSync(false);
+  acct={uid:'',email:'',refresh:'',idt:'',exp:0,last:0,err:''};acSave();acClearLocal();refreshPages();renderAcct();
+  toast('Đã đăng xuất. Dữ liệu vẫn lưu trong tài khoản; máy này đã được xóa sạch cho người khác dùng.');
+};
+$('#bSet').addEventListener('click',()=>renderAcct());
+document.addEventListener('visibilitychange',()=>{if(!acct.uid||!acOK())return;
+  if(document.visibilityState==='hidden'){clearTimeout(acT);acctSync(false)}else acctSync(false,true)});
+renderAcct();
+
 /* ---------- Nút Back của Android ---------- */
 if(AppP)AppP.addListener('backButton',()=>{
   if($('.panel.on')){closeAll();return}
@@ -820,7 +923,7 @@ fetch('vie1925.json').then(r=>r.json()).then(d=>{
   B=d;B.forEach((bk,b)=>bk[2].forEach((_,c)=>chList.push([b,c])));
   if(!B[pos.b]||!B[pos.b][2][pos.c])pos={b:39,c:4,v:1};
   $('#loading').remove();
-  const ready=()=>{build(pos.b,pos.c,{v:pos.v});if(drive.on)setTimeout(()=>syncNow(false),800);if(!store.get('hint2',0)){setTimeout(()=>toast('Vuốt ngang để lật trang · Chạm vào câu để chọn · Chạm thanh dưới để mở menu'),400);store.set('hint2',1)}};
+  const ready=()=>{build(pos.b,pos.c,{v:pos.v});if(drive.on)setTimeout(()=>syncNow(false),800);if(acct.uid)setTimeout(()=>acctSync(false,'boot'),800);if(!store.get('hint2',0)){setTimeout(()=>toast('Vuốt ngang để lật trang · Chạm vào câu để chọn · Chạm thanh dưới để mở menu'),400);store.set('hint2',1)}};
   (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(ready);
 }).catch(()=>{$('#loading').textContent='Không tải được dữ liệu Kinh Thánh.'});
 }

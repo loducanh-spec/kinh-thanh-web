@@ -787,7 +787,7 @@ if(AppP){AppP.addListener('resume',()=>{if(drive.on)syncNow(false)});AppP.addLis
 /* ---------- Tài khoản riêng cho bản web (Firebase Auth + Firestore, gọi REST) ----------
    Mỗi người 1 tài khoản email/mật khẩu; dữ liệu nằm ở users/<uid> (field data = JSON của payload()).
    Quy tắc Firestore chỉ cho chính chủ đọc/ghi. Điền FB sau khi tạo dự án Firebase. */
-const FB={apiKey:'',projectId:''};
+const FB={apiKey:'AIzaSyClg58d1Sknr5E4XZWV_nNIbyXHLPMNuGM',projectId:'kinh-thanh-1925-cb877'};
 const pos0=(store.get('pos',{})||{}).t||0; // vị trí đọc trước khi mở app lần này
 let acct=store.get('acct',{uid:'',email:'',refresh:'',idt:'',exp:0,last:0,err:''}), acBusy=false, acT=null, acOutArm=0;
 const acOK=()=>!NATIVE&&FB.apiKey&&FB.projectId;

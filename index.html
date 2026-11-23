@@ -16,12 +16,14 @@
 /* VOICE: yên tĩnh, như cầm một cuốn sách in cũ
    IDEA: trang sách giấy thật, lật cong như Moon Reader
    PICTURE: chính trang đọc chiếm toàn màn hình
-   COLOUR and TYPE: 3 nền giấy (nâu tối, đen, sáng); Noto Serif cho chữ, Be Vietnam Pro cho giao diện
+   COLOUR and TYPE: theme B "Óc chó & Đất nung", 4 nền (sáng, sepia, nâu tối, đen); Literata mặc định cho chữ (chọn thêm Noto Serif, Lora, Be Vietnam Pro), Be Vietnam Pro cho giao diện
    LAYOUT: trang đọc toàn màn, thanh trạng thái nhỏ ở đáy, menu nổi khi chạm giữa */
-:root{--bg:#211f10;--page:#24210f;--ink:#d8d0b8;--mute:#8f876d;--ui:#161512;--ui2:#2a2823;--uiInk:#f1ede4;--acc:#c9a85a;--line:#3a372e;
-  --fs:21px;--lh:1.6;--serif:'Noto Serif',Georgia,serif;--sans:'Be Vietnam Pro',system-ui,sans-serif}
-:root[data-t=black]{--bg:#111;--page:#121212;--ink:#ececec;--mute:#8a8a8a;--ui:#0b0b0b;--ui2:#262626;--acc:#c9b458;--line:#333}
-:root[data-t=light]{--bg:#efe6d0;--page:#f6eedb;--ink:#2b261c;--mute:#857a62;--ui:#fbf7ee;--ui2:#ece3cd;--uiInk:#2b261c;--acc:#8a5a14;--line:#d9ceb4}
+:root{--bg:#1c1411;--page:#221915;--ink:#ecdccf;--mute:#a8917f;--ui:#1a130f;--ui2:#2e221c;--uiInk:#f3e8df;--acc:#e08a62;--onAcc:#1a110c;--line:#3b2c24;--hlA:.32;
+  --fs:21px;--lh:1.6;--serif:'Literata','Noto Serif',Georgia,serif;--sans:'Be Vietnam Pro',system-ui,sans-serif}
+:root[data-t=black]{--bg:#000;--page:#000;--ink:#ede3db;--mute:#9b8d84;--ui:#0e0c0b;--ui2:#221e1b;--uiInk:#f1e9e2;--acc:#e08a62;--onAcc:#1a110c;--line:#2a2420}
+:root[data-t=light]{--bg:#f3ece5;--page:#faf6f2;--ink:#2b211c;--mute:#6f5d52;--ui:#fffdfb;--ui2:#f1e8df;--uiInk:#2b211c;--acc:#a3452a;--onAcc:#fff;--line:#e9ddd2;--hlA:.45}
+:root[data-t=sepia]{--bg:#e8d6be;--page:#efdfcb;--ink:#3a2a20;--mute:#6a5142;--ui:#f6ead9;--ui2:#e6d2b9;--uiInk:#3a2a20;--acc:#8f3c20;--onAcc:#fff;--line:#dcc5aa;--hlA:.45}
+:root[data-f=noto]{--serif:'Noto Serif',Georgia,serif}:root[data-f=lora]{--serif:'Lora','Noto Serif',Georgia,serif}:root[data-f=bvp]{--serif:'Be Vietnam Pro',system-ui,sans-serif}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
@@ -41,16 +43,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .clip{contain:strict}
 .txt.cont{text-align-last:justify}.per.cont{text-align-last:auto}.per.cont .v:last-child{text-align-last:justify}
 .chh{break-inside:avoid;text-align:center;margin:.2em 0 .9em}
-.chh .bk{display:block;font-family:var(--sans);font-size:.62em;letter-spacing:.04em;color:var(--mute)}
-.chh .cn{display:block;font-size:2.3em;line-height:1.1;font-weight:700;color:var(--acc)}
+.chh .bk{display:block;font-family:var(--sans);font-size:.56em;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.chh .cn{display:block;font-size:2.3em;line-height:1.1;font-weight:600;color:var(--acc)}
 .txt{margin:0}
-.v sup{font-size:.58em;color:var(--mute);margin:0 .18em 0 .1em;font-family:var(--sans);vertical-align:.55em;line-height:0}
+.v sup{font-size:.56em;font-weight:600;color:var(--acc);margin:0 .18em 0 .1em;font-family:var(--sans);vertical-align:.55em;line-height:0}
 .per .v{display:block;margin-bottom:.35em}
-.v.hy{background:rgba(214,190,60,.38)}.v.hg{background:rgba(110,180,90,.35)}.v.hb{background:rgba(90,150,220,.35)}.v.hp{background:rgba(220,110,150,.35)}
+.v.hy{background:rgb(233 198 64/var(--hlA))}.v.hg{background:rgb(125 187 106/var(--hlA))}.v.hb{background:rgb(106 159 219/var(--hlA))}.v.hp{background:rgb(224 127 162/var(--hlA))}.v.hv{background:rgb(165 139 216/var(--hlA))}
 .v.sel{text-decoration:underline dotted var(--acc) 2px;text-underline-offset:.22em}
 .v.flash{animation:fl 2.2s ease-out}
-.v.say{background:rgba(201,168,90,.3)}
-@keyframes fl{0%,40%{background:rgba(201,168,90,.55)}100%{background:transparent}}
+.v.say{background:color-mix(in srgb,var(--acc) 24%,transparent)}
+@keyframes fl{0%,40%{background:color-mix(in srgb,var(--acc) 40%,transparent)}100%{background:transparent}}
 .v .nt{font-size:.6em;vertical-align:.5em;color:var(--acc);margin-left:.15em}
 /* iPhone mở từ màn hình chính: kéo thanh dưới xuống sát vạch Home, bỏ khoảng trống thừa */
 html.iosapp,html.iosapp body{background:var(--page)}
@@ -79,19 +81,19 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 .about{padding:4px 18px 24px;line-height:1.55;font-size:15px}.about h3{font-size:22px;margin:6px 0 2px;font-family:var(--serif,serif)}
 .about .ver{color:var(--acc);font-weight:600;margin:0 0 14px}.about dl{margin:0}.about dt{font-size:12px;color:var(--mute);margin:12px 0 2px;text-transform:uppercase;letter-spacing:.04em}
 .about dd{margin:0}.about small{color:var(--mute)}
-.tab{height:38px;padding:0 13px;border-radius:8px;background:var(--ui2);font-size:15px}
-.tab.on{background:var(--uiInk);color:var(--ui)}
+.tab{height:38px;padding:0 13px;border-radius:10px;background:var(--ui2);font-size:15px}
+.tab.on{background:var(--acc);color:var(--onAcc);font-weight:600}
 .pb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px}
 .sec{padding:14px 20px 6px;font-size:13px;color:var(--mute);font-weight:600}
 .bkRow{display:block;width:100%;text-align:left;padding:15px 20px;font-size:21px}
 .bkRow.cur{background:var(--ui2)}
 .grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:8px 20px 16px}
-.grid button{height:54px;border-radius:10px;background:var(--ui2);font-weight:600;font-size:19px}
-.grid button.cur{background:var(--uiInk);color:var(--ui)}
+.grid button{height:54px;border-radius:12px;background:var(--ui2);font-weight:600;font-size:19px}
+.grid button.cur{background:var(--acc);color:var(--onAcc)}
 .recent{border-top:1px solid var(--line);padding:10px 0 12px}
 .recent h3{margin:0 20px 8px;font-size:17px}
 .cards{display:flex;gap:10px;overflow-x:auto;padding:0 20px}
-.card{flex:none;width:170px;text-align:left;background:var(--ui2);border-radius:14px;padding:12px 14px}
+.card{flex:none;width:170px;text-align:left;background:var(--ui2);border-radius:16px;padding:12px 14px}
 .card b{display:block;font-size:17px}.card small{color:var(--mute);font-size:13px}
 .li{display:flex;align-items:center;width:100%;text-align:left;padding:13px 20px;gap:12px;border-bottom:1px solid var(--line)}
 .li b{font-weight:600;font-size:17px}.li span{flex:1;color:var(--mute);font-size:13px;text-align:right}
@@ -105,7 +107,7 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 .tabs{overflow-x:auto}.tab{white-space:nowrap}
 /* Tab Mục lục: 4 ô đều nhau, biểu tượng trên chữ dưới, bo góc vừa phải, chữ không bao giờ tràn */
 .tocTabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;overflow:visible!important}
-.tocTabs .tab{height:auto;min-height:54px;padding:6px 2px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+.tocTabs .tab{height:auto;min-height:54px;padding:6px 2px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   font-size:12.5px;line-height:1.15;white-space:normal;text-align:center;overflow:hidden}
 .tocTabs .tab svg{width:21px;height:21px;flex:none}.tocTabs .tab span{display:block;max-width:100%;overflow-wrap:anywhere}
 .empty{padding:30px 20px;color:var(--mute);text-align:center}
@@ -114,52 +116,53 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 .sbox input{flex:1;height:48px;border-radius:24px;border:1px solid var(--line);background:var(--ui2);color:var(--uiInk);padding:0 18px;font-size:16px;font-family:var(--sans);outline:none}
 .sbox input:focus{border-color:var(--acc)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;padding:4px 20px 12px}
-.chip{flex:none;height:36px;padding:0 14px;border-radius:8px;background:var(--ui2);font-size:15px;white-space:nowrap}
+.chip{flex:none;height:36px;padding:0 14px;border-radius:10px;background:var(--ui2);font-size:15px;white-space:nowrap}
 .res{display:block;width:100%;text-align:left;padding:12px 20px;border-bottom:1px solid var(--line)}
 .res b{font-size:14px;color:var(--acc);font-weight:600}.res p{margin:3px 0 0;font-family:var(--serif);font-size:16px;line-height:1.5}
-.res mark{background:rgba(201,168,90,.4);color:inherit;border-radius:2px}
+.res mark{background:color-mix(in srgb,var(--acc) 30%,transparent);color:inherit;border-radius:2px}
 .scope{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:0 16px 10px}
 .scope .chip{height:40px;padding:0 8px;font-size:15px;overflow:hidden;text-overflow:ellipsis}
 .scope .chip.wide{grid-column:1/-1}
 /* sheets */
-.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--ui);color:var(--uiInk);border-radius:14px 14px 0 0;padding:12px 16px calc(14px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));max-height:85%;overflow-y:auto;box-shadow:0 -8px 30px rgba(0,0,0,.4);transform:translateY(105%);transition:transform .22s;z-index:30}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--ui);color:var(--uiInk);border-radius:20px 20px 0 0;padding:14px 16px calc(14px + max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px)));max-height:85%;overflow-y:auto;box-shadow:0 -8px 30px rgba(0,0,0,.4);transform:translateY(105%);transition:transform .22s;z-index:30}
 .sheet.on{transform:none}
 .row{margin:0 0 12px}.row[hidden]{display:none}
 .row label{display:block;font-size:13px;color:var(--mute);margin:0 0 6px}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px}
-.btn{height:42px;padding:0 10px;border-radius:8px;background:var(--ui2);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.btn.pri{background:var(--uiInk);color:var(--ui);font-weight:600}.btn.sm{height:36px;padding:0 16px}
-.seg .btn.on{background:var(--uiInk);color:var(--ui);font-weight:600}
-.val{display:grid;place-items:center;font-size:16px;font-weight:600;border:1px solid var(--line);border-radius:8px}
+.btn{height:44px;padding:0 10px;border-radius:12px;background:var(--ui2);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.btn.pri{background:var(--acc);color:var(--onAcc);font-weight:600}.btn.sm{height:36px;padding:0 16px}
+.seg .btn.on{background:var(--acc);color:var(--onAcc);font-weight:600}
+.val{display:grid;place-items:center;font-size:16px;font-weight:600;border:1px solid var(--line);border-radius:12px}
 .acct input{display:block;width:100%;height:44px;margin:0 0 8px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--ui2);color:var(--uiInk);font-size:16px;font-family:inherit}
 .acct .seg{margin:0 0 8px}.acct a{color:var(--acc);font-size:14px;text-decoration:underline;cursor:pointer}
 .drvSt{font-size:14px;line-height:1.45;margin:0 0 8px;color:var(--uiInk);overflow-wrap:anywhere}
 .vbox{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}
 #voiceSel{height:42px;border-radius:8px;border:1px solid var(--line);background:var(--ui2);color:var(--uiInk);font:15px var(--sans);padding:0 10px;min-width:0}
 .vhint{font-size:12.5px;color:var(--mute);margin-top:6px;line-height:1.45}
+.fontSeg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.fontSeg .btn{font-size:17px}.fontSeg .btn.on{background:var(--acc);color:var(--onAcc)}
 .setHead{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}.setHead b{font-size:17px}
 .selTop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
 .selTop b{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.selRow{display:flex;align-items:center;gap:6px}
-.dot{flex:none;width:36px;height:36px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;padding:0}
+.selRow{display:flex;align-items:center;gap:5px}
+.dot{flex:0 1 36px;width:36px;height:auto;aspect-ratio:1;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;padding:0}
 .dot.none{background:var(--ui2)}
-.sep{flex:1}
+.sep{flex:1 1 2px}
 .ic{flex:none;width:40px;height:40px;border-radius:8px;display:grid;place-items:center;background:var(--ui2)}
-.selTop .ic{background:none;width:36px;height:36px}
+.selTop .ic{background:none;width:36px;height:36px}.selRow .ic{width:36px;height:36px}
 .ic svg,.dot svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#selNoteBtn.has{background:var(--acc);color:#111}
+#selNoteBtn.has{background:var(--acc);color:var(--onAcc)}
 #noteBox{margin-top:10px;display:grid;gap:8px}#noteBox[hidden]{display:none}
 textarea{width:100%;min-height:64px;border-radius:8px;border:1px solid var(--line);background:var(--ui2);color:var(--uiInk);padding:10px;font:16px var(--sans);resize:vertical}
 #toast{position:absolute;z-index:60;left:50%;bottom:60px;transform:translateX(-50%);background:var(--uiInk);color:var(--ui);padding:10px 18px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;max-width:88%;text-align:center}
 #toast.on{opacity:1}
-#ttsBar{position:absolute;left:10px;right:10px;bottom:10px;display:none;z-index:15;background:var(--ui);color:var(--uiInk);border-radius:12px;padding:6px 8px 8px;box-shadow:0 6px 24px rgba(0,0,0,.45)}
+#ttsBar{position:absolute;left:10px;right:10px;bottom:10px;display:none;z-index:15;background:var(--ui);color:var(--uiInk);border-radius:18px;padding:6px 8px 8px;box-shadow:0 6px 24px rgba(0,0,0,.45)}
 #ttsBar.on{display:block}
 .tRef{display:flex;align-items:center;justify-content:space-between;padding:0 4px 2px 8px;font-size:14px;font-weight:600}
 .tRef .tx{width:36px;height:36px;display:grid;place-items:center}
 .tBtns{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;gap:4px}
 .tBtns button{height:58px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .tBtns small{font-size:10.5px;line-height:1.15;text-align:center;color:var(--mute);white-space:nowrap}
-.tBtns .big{height:56px;width:56px;justify-self:center;border-radius:50%;background:var(--uiInk);color:var(--ui)}
+.tBtns .big{height:56px;width:56px;justify-self:center;border-radius:50%;background:var(--acc);color:var(--onAcc)}
 #ttsBar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 #ttsBar .big svg{fill:currentColor;stroke:none;width:24px;height:24px}
 #bar .fsBar{position:absolute;left:12px;right:12px;bottom:74px;background:var(--ui);color:var(--uiInk);border-radius:30px;display:flex;align-items:center;gap:6px;padding:4px 8px;box-shadow:0 4px 18px rgba(0,0,0,.35)}
@@ -232,7 +235,8 @@ html.full #app{padding-top:0;padding-bottom:0}
   <!-- Cài đặt -->
   <div class="sheet" id="shSet">
     <div class="setHead"><b>Hiển thị</b><button class="btn pri sm" data-shclose>Xong</button></div>
-    <div class="row"><label>Nền</label><div class="seg" id="segTheme"><button class="btn" data-v="brown">Nâu tối</button><button class="btn" data-v="black">Đen</button><button class="btn" data-v="light">Sáng</button></div></div>
+    <div class="row"><label>Nền</label><div class="seg" id="segTheme"><button class="btn" data-v="light">Sáng</button><button class="btn" data-v="sepia">Sepia</button><button class="btn" data-v="brown">Nâu tối</button><button class="btn" data-v="black">Đen</button></div></div>
+    <div class="row"><label>Kiểu chữ</label><div class="fontSeg" id="segFont"><button class="btn" data-v="literata" style="font-family:'Literata',serif">Literata</button><button class="btn" data-v="noto" style="font-family:'Noto Serif',serif">Noto Serif</button><button class="btn" data-v="lora" style="font-family:'Lora',serif">Lora</button><button class="btn" data-v="bvp" style="font-family:'Be Vietnam Pro',sans-serif">Be Vietnam</button></div></div>
     <div class="row"><label>Cỡ chữ</label><div class="seg"><button class="btn" id="fsDn">A−</button><span class="val" id="fsShow"></span><button class="btn" id="fsUp">A+</button></div></div>
     <div class="row"><label>Giãn dòng</label><div class="seg"><button class="btn" id="lhDn">Hẹp hơn</button><span class="val" id="lhShow"></span><button class="btn" id="lhUp">Rộng hơn</button></div></div>
     <div class="row" id="rowFull"><label>Toàn màn hình (ẩn thanh trạng thái điện thoại)</label><div class="seg" id="segFull"><button class="btn" data-v="0">Tắt</button><button class="btn" data-v="1">Bật</button></div></div>
@@ -256,10 +260,11 @@ html.full #app{padding-top:0;padding-bottom:0}
   <div class="sheet" id="shSel">
     <div class="selTop"><b id="selRef"></b><button class="ic" data-shclose aria-label="Đóng"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="selRow" id="selColors">
-      <button class="dot" data-c="hy" style="background:#d6be3c" aria-label="Tô vàng"></button>
-      <button class="dot" data-c="hg" style="background:#6eb45a" aria-label="Tô xanh lá"></button>
-      <button class="dot" data-c="hb" style="background:#5a96dc" aria-label="Tô xanh dương"></button>
-      <button class="dot" data-c="hp" style="background:#dc6e96" aria-label="Tô hồng"></button>
+      <button class="dot" data-c="hy" style="background:#e9c640" aria-label="Tô vàng"></button>
+      <button class="dot" data-c="hg" style="background:#7dbb6a" aria-label="Tô xanh lá"></button>
+      <button class="dot" data-c="hb" style="background:#6a9fdb" aria-label="Tô xanh dương"></button>
+      <button class="dot" data-c="hp" style="background:#e07fa2" aria-label="Tô hồng"></button>
+      <button class="dot" data-c="hv" style="background:#a58bd8" aria-label="Tô tím"></button>
       <button class="dot none" data-c="" aria-label="Bỏ tô màu"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M6.5 17.5l11-11"/></svg></button>
       <span class="sep"></span>
       <button class="ic" id="selNoteBtn" aria-label="Ghi chú"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
@@ -276,7 +281,7 @@ html.full #app{padding-top:0;padding-bottom:0}
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const store={get(k,d){try{const v=localStorage.getItem('kt.'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('kt.'+k,JSON.stringify(v))}catch(e){}}};
 let B=[], chList=[];                     // B[b]=[name,id,chapters]; chList = flat [b,c]
-const set=Object.assign({t:'brown',fs:21,lh:1.6,per:0,rate:1,full:0,voice:''},store.get('set',{}));
+const set=Object.assign({t:'brown',ff:'literata',fs:21,lh:1.6,per:0,rate:1,full:0,voice:''},store.get('set',{}));
 const CAP=window.capacitorExports, NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const P=n=>NATIVE&&CAP?CAP.registerPlugin(n):null;
 const TTS=P('TextToSpeech'), RA=P('ReadAloud'), AppP=P('App'), FS=P('Filesystem'), ShareP=P('Share');
@@ -294,13 +299,16 @@ const chIdx=(b,c)=>{let n=0;for(let i=0;i<b;i++)n+=B[i][2].length;return n+c};
 
 function applySettings(){
   document.documentElement.dataset.t=set.t;
+  document.documentElement.dataset.f=set.ff;
+  $$('#segFont .btn').forEach(x=>x.classList.toggle('on',x.dataset.v===set.ff));
+  {const m=document.querySelector('meta[name=theme-color]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue('--page').trim()}
   document.documentElement.style.setProperty('--fs',set.fs+'px');
   document.documentElement.style.setProperty('--lh',set.lh);
   $$('#segTheme .btn').forEach(x=>x.classList.toggle('on',x.dataset.v===set.t));
   $$('#segPer .btn').forEach(x=>x.classList.toggle('on',+x.dataset.v===set.per));
   $$('#segRate .btn').forEach(x=>x.classList.toggle('on',+x.dataset.v===set.rate));
   $$('#segFull .btn').forEach(x=>x.classList.toggle('on',+x.dataset.v===set.full));
-  if(NATIVE&&CAP&&CAP.SystemBars){try{CAP.SystemBars.setStyle({style:set.t==='light'?'LIGHT':'DARK'})}catch(e){}}
+  if(NATIVE&&CAP&&CAP.SystemBars){try{CAP.SystemBars.setStyle({style:(set.t==='light'||set.t==='sepia')?'LIGHT':'DARK'})}catch(e){}}
   if($('#fsRange')){$('#fsRange').value=set.fs;$('#fsVal').textContent=set.fs}
   if($('#fsShow')){$('#fsShow').textContent=set.fs;$('#lhShow').textContent=set.lh.toFixed(1)}
   store.set('set',set);
@@ -470,7 +478,7 @@ function verseAt(x,y){ // chạm vào khe giữa hai dòng: dò lên/xuống và
   return null}
 
 /* ---------- Chọn câu, tô màu, ghi chú ---------- */
-function paint(k){const h=hl[k];$$(`.v[data-k="${k}"]`).forEach(el=>{el.classList.remove('hy','hg','hb','hp');if(h&&h.c)el.classList.add(h.c);
+function paint(k){const h=hl[k];$$(`.v[data-k="${k}"]`).forEach(el=>{el.classList.remove('hy','hg','hb','hp','hv');if(h&&h.c)el.classList.add(h.c);
   const nt=el.querySelector('.nt');if(h&&h.n&&!nt&&el.dataset.e)el.insertAdjacentHTML('beforeend','<span class="nt">✎</span>');if(!(h&&h.n)&&nt)nt.remove();
   el.classList.toggle('sel',sel.has(k))})}
 function toggleSel(k,force){if(sel.has(k)&&!force)sel.delete(k);else sel.add(k);paint(k);
@@ -501,6 +509,9 @@ $$('[data-shclose]').forEach(b=>b.onclick=()=>{if(sel.size)clearSel();else close
 $('#bClose').onclick=()=>$('#bar').classList.remove('on');
 $('#bSet').onclick=()=>{$('#bar').classList.remove('on');openSheet('#shSet')};
 $('#segTheme').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;set.t=b.dataset.v;applySettings()};
+const FF={literata:'Literata',noto:'Noto Serif',lora:'Lora',bvp:'Be Vietnam Pro'};
+$('#segFont').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||b.dataset.v===set.ff)return;set.ff=b.dataset.v;applySettings();
+  const f=FF[set.ff];(document.fonts?Promise.all([document.fonts.load('400 20px "'+f+'"','Đức Chúa Trời'),document.fonts.load('600 20px "'+f+'"','Đức')]).catch(()=>{}):Promise.resolve()).then(relayout)};
 const relayout=()=>{applySettings();build(pos.b,pos.c,{v:pos.v})};
 const setFs=n=>{n=Math.max(14,Math.min(40,n));if(n===set.fs)return;set.fs=n;relayout()};
 $('#mFsUp').onclick=()=>setFs(set.fs+1);$('#mFsDn').onclick=()=>setFs(set.fs-1);
@@ -533,7 +544,7 @@ function renderToc(){
 }
 /* Danh sách câu đã tô màu / ghi chú: gộp các câu liền nhau cùng màu, cùng lần đánh dấu */
 let markF='all';
-const MC={hy:['#d6be3c','Vàng'],hg:['#6eb45a','Xanh lá'],hb:['#5a96dc','Xanh dương'],hp:['#dc6e96','Hồng']};
+const MC={hy:['#e9c640','Vàng'],hg:['#7dbb6a','Xanh lá'],hb:['#6a9fdb','Xanh dương'],hp:['#e07fa2','Hồng'],hv:['#a58bd8','Tím']};
 const dmy=t=>{if(!t||t<1e9)return'';const d=new Date(t),p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes())+' · '+p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()};
 function markGroups(){
   const items=Object.entries(hl).map(([k,h])=>{const [b,c,v]=k.split('.').map(Number);return{b,c,v,h}})
@@ -933,7 +944,7 @@ async function renderAbout(){
     <dl>
       <dt>Phát triển</dt><dd>David<br><small>Viết mã cùng trợ lý AI Claude (Anthropic)</small></dd>
       <dt>Văn bản</dt><dd>Kinh Thánh bản Truyền Thống 1925 (Vietnamese Bible 1925)<br><small>Thánh Kinh Hội (Bible Society Vietnam). Thuộc phạm vi công cộng. Dữ liệu lấy từ YouVersion (bible.com), mã bản dịch VIE1925.</small></dd>
-      <dt>Phông chữ</dt><dd>Noto Serif và Be Vietnam Pro<br><small>Giấy phép SIL Open Font License</small></dd>
+      <dt>Phông chữ</dt><dd>Literata, Noto Serif, Lora và Be Vietnam Pro<br><small>Giấy phép SIL Open Font License</small></dd>
       <dt>Dữ liệu của bạn</dt><dd>${nHl} câu đã tô màu/ghi chú, ${hist.length} chương trong lịch sử đọc.<br><small>${NATIVE?'Lưu trên máy; có thể đồng bộ Google Drive trong Cài đặt.':'Lưu trên máy; đăng nhập tài khoản trong Cài đặt để lưu lên mạng.'}</small></dd>
       <dt>Tính năng</dt><dd><small>Lật trang cong giấy · tô 4 màu và ghi chú · tìm kiếm có dấu/không dấu · đọc thành tiếng (chạy nền trên Android) · 3 nền màu · lịch sử đọc · sao lưu, đồng bộ.</small></dd>
     </dl></div>`;

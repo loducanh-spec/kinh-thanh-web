@@ -98,6 +98,10 @@ html.full:not(.iosapp) .panel{padding-top:var(--sbh)}
 .grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:8px 20px 16px}
 .grid button{height:54px;border-radius:12px;background:var(--ui2);font-weight:600;font-size:19px}
 .grid button.cur{background:var(--acc);color:var(--onAcc)}
+.grid button.vl{font-size:15px}.grid button.vx{opacity:.3}
+.vhead{display:flex;align-items:center;gap:10px;padding:10px 20px 2px}.vhead b{font-size:17px;font-weight:600}.vhead span{margin-left:auto;font-size:13px;color:var(--mute)}
+.vback{display:flex;align-items:center;gap:2px;height:40px;padding:0 12px 0 6px;border-radius:10px;background:var(--ui2);font-size:15px}
+.vback svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .recent{border-top:1px solid var(--line);padding:10px 0 12px}
 .recent h3{margin:0 20px 8px;font-size:17px}
 .cards{display:flex;gap:10px;overflow-x:auto;padding:0 20px}
@@ -530,14 +534,20 @@ $('#segPer').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;set.p
 $('#bPrevCh').onclick=()=>step(-1);$('#bNextCh').onclick=()=>step(1);
 
 /* Mục lục */
-let tocTab='books', openBook=null;
+let tocTab='books', openBook=null, openCh=null; // Mục lục: Sách → Đoạn → Câu
 const ago=t=>{const m=Math.round((Date.now()-t)/60000);return m<1?'vừa xong':m<60?m+' phút trước':m<1440?Math.round(m/60)+' giờ trước':Math.round(m/1440)+' ngày trước'};
+// Lưới câu của một đoạn: '' là câu đã gộp vào câu trước (bỏ qua), null là câu không có trong bản này (hiện mờ)
+function verseGrid(b,c){const vs=B[b][2][c];let h='';
+  for(let v=1;v<=vs.length;v++){if(vs[v-1]==='')continue;const l=vlabel(b,c,v);
+    h+=vs[v-1]==null?`<button class="vx" disabled aria-label="Câu ${v} không có trong bản này">${v}</button>`
+      :`<button class="${l.length>3?'vl ':''}${b===pos.b&&c===pos.c&&v===pos.v?'cur':''}" data-b="${b}" data-c="${c}" data-v="${v}">${l}</button>`}
+  return `<div class="vhead"><button class="vback" data-chback aria-label="Chọn đoạn khác"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Đoạn</button><b>Đoạn ${c+1}</b><span>Chọn câu</span></div><div class="grid">${h}</div>`}
 function renderToc(){
   $$('#pToc .tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tocTab));
   if(tocTab==='books'){
     $('#tocBody').innerHTML=B.map((bk,i)=>(i===0?'<div class="sec">CỰU ƯỚC</div>':i===39?'<div class="sec">TÂN ƯỚC</div>':'')+
       `<button class="bkRow${i===openBook?' cur':''}" data-b="${i}">${esc(bk[0])}</button>`+
-      (i===openBook?`<div class="grid">${bk[2].map((_,c)=>`<button class="${i===pos.b&&c===pos.c?'cur':''}" data-b="${i}" data-c="${c}">${c+1}</button>`).join('')}</div>`:'')).join('');
+      (i!==openBook?'':openCh===null?`<div class="grid">${bk[2].map((_,c)=>`<button class="${i===pos.b&&c===pos.c?'cur':''}" data-b="${i}" data-ch="${c}">${c+1}</button>`).join('')}</div>`:verseGrid(i,openCh))).join('');
     $('#tocRecent').style.display='';
     $('#tocRecent').innerHTML=`<h3>Gần đây</h3><div class="cards">${hist.slice(0,10).map(h=>`<button class="card" data-b="${h.b}" data-c="${h.c}" data-v="${h.v}"><b>${esc(ref(h.b,h.c,h.v))}</b><small>${ago(h.t)}</small></button>`).join('')||'<div class="empty">Chưa có</div>'}</div>`;
   }else if(tocTab==='about'){
@@ -573,15 +583,17 @@ function renderMarks(){
         `<span class="mkT">${t}</span>${x.n?`<span class="mkN">✎ ${esc(x.n)}</span>`:''}</button>`}).join('')
      :'<div class="empty">'+(all?'Không có câu nào khớp bộ lọc':'Chưa có câu nào được tô màu hoặc ghi chú.<br>Chạm vào một câu khi đang đọc để đánh dấu.')+'</div>');
 }
-function openToc(tab){closeAll();tocTab=tab||'books';openBook=pos.b;renderToc();$('#pToc').classList.add('on');
+function openToc(tab){closeAll();tocTab=tab||'books';openBook=pos.b;openCh=null;renderToc();$('#pToc').classList.add('on');
   if(tocTab==='books')requestAnimationFrame(()=>{const r=$('#tocBody .bkRow.cur');if(r)r.scrollIntoView({block:'start'})})}
 $('#pToc').addEventListener('click',e=>{
   const t=e.target.closest('[data-tab]');if(t){tocTab=t.dataset.tab;renderToc();$('#tocBody').scrollTop=0;return}
   const mf=e.target.closest('[data-mf]');if(mf){markF=mf.dataset.mf;renderMarks();return}
   if(e.target.id==='hClear'){hist=[];store.set('hist',hist);renderToc();return}
+  if(e.target.closest('[data-chback]')){openCh=null;renderToc();const r=$('#tocBody .bkRow.cur');if(r)r.scrollIntoView({block:'start'});return}
   const b=e.target.closest('[data-b]');if(!b)return;
+  if(b.dataset.ch!==undefined){openCh=+b.dataset.ch;renderToc();const r=$('#tocBody .bkRow.cur');if(r)r.scrollIntoView({block:'start'});return}
   if(b.dataset.c!==undefined)return go(+b.dataset.b,+b.dataset.c,+(b.dataset.v||1));
-  openBook=openBook===+b.dataset.b?null:+b.dataset.b;renderToc();
+  openCh=null;openBook=openBook===+b.dataset.b?null:+b.dataset.b;renderToc();
   const r=$('#tocBody .bkRow.cur');if(r)r.scrollIntoView({block:'start',behavior:'smooth'});
 });
 $('#stBook').onclick=()=>openToc();$('#stMid').onclick=$('#stMenu').onclick=()=>{closeSheets();$('#bar').classList.toggle('on')};$('#bRef').onclick=()=>openToc();$('#bHist').onclick=()=>openToc('hist');$('#bMarks').onclick=()=>openToc('marks');
@@ -967,6 +979,7 @@ const WEB_UPDATED='23/11/2026';
 
 /* ---------- Nút Back của Android ---------- */
 if(AppP)AppP.addListener('backButton',()=>{
+  if($('#pToc').classList.contains('on')&&tocTab==='books'&&openCh!==null){openCh=null;renderToc();return} // đang chọn câu: lùi về chọn đoạn
   if($('.panel.on')){closeAll();return}
   if(sel.size){clearSel();return}
   if($('.sheet.on')){closeSheets();return}

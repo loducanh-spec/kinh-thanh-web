@@ -71,13 +71,17 @@ html.iosapp #status,html.iosapp #status button{height:30px}
 .top,.bot{position:absolute;left:0;right:0;background:var(--ui);color:var(--uiInk);display:flex;align-items:center;gap:4px;padding:8px 10px;box-shadow:0 0 18px rgba(0,0,0,.35)}
 .top{top:0;padding-top:calc(10px + var(--sbh,0px))}.bot{bottom:0}
 html.full{--sbh:30px}
-html.full .panel{padding-top:var(--sbh)}
+
 .ib{width:46px;height:46px;border-radius:23px;display:grid;place-items:center}
 .ib svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pill{flex:1;height:46px;border-radius:23px;background:var(--ui2);font-weight:600;font-size:18px;display:flex;align-items:center;justify-content:space-between;padding:0 6px}
 .pill b{flex:1;text-align:center;font-weight:600}
 /* panels */
 .panel{position:absolute;inset:0;background:var(--ui);color:var(--uiInk);display:none;flex-direction:column;z-index:20}
+/* Bảng phủ cả vùng thanh trạng thái (inset:0 không tính padding của #app), nên tự chừa vùng an toàn phía trên */
+.panel{padding-top:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px))}
+html.iosapp .panel{padding-top:calc(max(env(safe-area-inset-top,0px),20px) + 10px)}
+html.full:not(.iosapp) .panel{padding-top:var(--sbh)}
 .panel.on{display:flex}
 .ph{display:flex;align-items:center;gap:6px;padding:8px 8px 4px;min-height:60px}
 .ph h2{margin:0;font-size:24px;font-weight:600;flex:1}

@@ -750,6 +750,10 @@ if(RA){
   if(AppP)AppP.addListener('resume',()=>setTimeout(raSync,300));
   setTimeout(raSync,1500); // mở lại app khi dịch vụ vẫn đang đọc
 }
+// Câu đầu của chương thì đọc trước: sách mới → "Tên sách, chương 1."; chương khác → "Chương N." (giống ReadAloudService.heading)
+const bookSay=n=>n.replace(/^III /,'Ba ').replace(/^II /,'Hai ').replace(/^I /,'Một ');
+function heading(b,c,v){const fv=B[b][2][c].findIndex(x=>x)+1;if(v!==fv)return '';
+  return c===0?bookSay(B[b][0])+', chương 1. ':'Chương '+(c+1)+'. '}
 function sayNext(){
   if(RA&&tts&&!tts.paused){const v=curVoice();
     RA.play({b:tts.b,c:tts.c,v:tts.v,rate:set.rate,voice:(v&&v.uri)||''}).catch(e=>toast(String(e&&e.message||e)));
@@ -760,7 +764,7 @@ function sayNext(){
   sayK=b+'.'+c+'.'+v;$$('.v.say').forEach(e=>e.classList.remove('say'));$$(`.v[data-k="${sayK}"]`).forEach(e=>e.classList.add('say'));
   $('#ttsRef').textContent='Đang đọc '+ref(b,c,v);
   if(!vtext(b,c,v)){tts.v++;return sayNext()}
-  speakText(vtext(b,c,v)).then(()=>{if(tts&&tts.run===run&&!tts.paused){tts.v++;sayNext()}},()=>{});
+  speakText(heading(b,c,v)+vtext(b,c,v)).then(()=>{if(tts&&tts.run===run&&!tts.paused){tts.v++;sayNext()}},()=>{});
 }
 function ttsGo(b,c,v){if(!tts)return;if(!RA)ttsHalt();Object.assign(tts,{b,c,v,paused:false,run:Date.now()});ttsIcon();if(TTS)sayNext();else setTimeout(sayNext,120)}
 function ttsStop(){tts=null;sayK=null;ttsHalt();$('#ttsBar').classList.remove('on');$$('.v.say').forEach(e=>e.classList.remove('say'))}

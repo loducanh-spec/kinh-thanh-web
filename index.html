@@ -218,9 +218,9 @@ html.full #app{padding-top:0;padding-bottom:0}
       <div class="tRef"><span id="ttsRef"></span><button class="tx" id="ttsStop" aria-label="Dừng đọc"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
       <div class="tBtns">
         <button class="gest" id="ttsPrevCh" aria-label="Chương trước"><svg viewBox="0 0 24 24"><path d="M6 5v14"/><path d="M18 6l-8 6 8 6z"/></svg><small>Chương<br>trước</small></button>
-        <button class="gest" id="ttsPrevV" aria-label="Câu trước"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 108-8H8"/><path d="M11 1L8 4l3 3"/></svg><small>Câu<br>trước</small></button>
+        <button class="gest" id="ttsPrevV" aria-label="Đoạn trước"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 108-8H8"/><path d="M11 1L8 4l3 3"/></svg><small>Đoạn<br>trước</small></button>
         <button class="gest big" id="ttsPause" aria-label="Tạm dừng / Tiếp tục"><span id="ttsIco"><svg viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg></span></button>
-        <button class="gest" id="ttsNextV" aria-label="Câu sau"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-8-8h4"/><path d="M13 1l3 3-3 3"/></svg><small>Câu<br>sau</small></button>
+        <button class="gest" id="ttsNextV" aria-label="Đoạn sau"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-8-8h4"/><path d="M13 1l3 3-3 3"/></svg><small>Đoạn<br>sau</small></button>
         <button class="gest" id="ttsNextCh" aria-label="Chương sau"><svg viewBox="0 0 24 24"><path d="M18 5v14"/><path d="M6 6l8 6-8 6z"/></svg><small>Chương<br>sau</small></button>
       </div>
     </div>
@@ -252,7 +252,7 @@ html.full #app{padding-top:0;padding-bottom:0}
     <div class="row"><label>Cỡ chữ</label><div class="seg"><button class="btn" id="fsDn">A−</button><span class="val" id="fsShow"></span><button class="btn" id="fsUp">A+</button></div></div>
     <div class="row"><label>Giãn dòng</label><div class="seg"><button class="btn" id="lhDn">Hẹp hơn</button><span class="val" id="lhShow"></span><button class="btn" id="lhUp">Rộng hơn</button></div></div>
     <div class="row" id="rowFull"><label>Toàn màn hình (ẩn thanh trạng thái điện thoại)</label><div class="seg" id="segFull"><button class="btn" data-v="0">Tắt</button><button class="btn" data-v="1">Bật</button></div></div>
-    <div class="row"><label>Trình bày</label><div class="seg" id="segPer"><button class="btn" data-v="0">Liền đoạn</button><button class="btn" data-v="1">Từng câu</button></div></div>
+    <div class="row"><label>Trình bày</label><div class="seg" id="segPer"><button class="btn" data-v="0">Liền mạch</button><button class="btn" data-v="1">Từng đoạn</button></div></div>
     <div class="row"><label>Giọng đọc</label><div class="vbox"><select id="voiceSel"></select><button class="gest btn" id="voiceTry">Nghe thử</button></div><div class="vhint" id="voiceHint"></div></div>
     <div class="row"><label>Tốc độ đọc</label><div class="seg" id="segRate"><button class="btn" data-v="0.8">Chậm</button><button class="btn" data-v="1">Vừa</button><button class="btn" data-v="1.2">Nhanh</button></div></div>
     <div class="row acct" id="rowAcct" hidden><label>Tài khoản (lưu chỗ đọc, tô màu, ghi chú lên mạng)</label>
@@ -281,9 +281,9 @@ html.full #app{padding-top:0;padding-bottom:0}
       <span class="sep"></span>
       <button class="ic" id="selNoteBtn" aria-label="Ghi chú"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
       <button class="ic" id="selCopy" aria-label="Sao chép"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/></svg></button>
-      <button class="gest ic" id="selRead" aria-label="Đọc từ câu này"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/></svg></button>
+      <button class="gest ic" id="selRead" aria-label="Đọc từ đoạn này"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/></svg></button>
     </div>
-    <div id="noteBox" hidden><textarea id="selNote" placeholder="Ghi chú cho câu này…"></textarea><button class="btn pri" id="selSave">Lưu ghi chú</button></div>
+    <div id="noteBox" hidden><textarea id="selNote" placeholder="Ghi chú cho đoạn này…"></textarea><button class="btn pri" id="selSave">Lưu ghi chú</button></div>
   </div>
 </div>
 
@@ -534,14 +534,14 @@ $('#segPer').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;set.p
 $('#bPrevCh').onclick=()=>step(-1);$('#bNextCh').onclick=()=>step(1);
 
 /* Mục lục */
-let tocTab='books', openBook=null, openCh=null; // Mục lục: Sách → Đoạn → Câu
+let tocTab='books', openBook=null, openCh=null; // Mục lục: Sách → Chương → Đoạn (đoạn = câu Kinh Thánh, theo cách gọi David chốt)
 const ago=t=>{const m=Math.round((Date.now()-t)/60000);return m<1?'vừa xong':m<60?m+' phút trước':m<1440?Math.round(m/60)+' giờ trước':Math.round(m/1440)+' ngày trước'};
 // Lưới câu của một đoạn: '' là câu đã gộp vào câu trước (bỏ qua), null là câu không có trong bản này (hiện mờ)
 function verseGrid(b,c){const vs=B[b][2][c];let h='';
   for(let v=1;v<=vs.length;v++){if(vs[v-1]==='')continue;const l=vlabel(b,c,v);
-    h+=vs[v-1]==null?`<button class="vx" disabled aria-label="Câu ${v} không có trong bản này">${v}</button>`
+    h+=vs[v-1]==null?`<button class="vx" disabled aria-label="Đoạn ${v} không có trong bản này">${v}</button>`
       :`<button class="${l.length>3?'vl ':''}${b===pos.b&&c===pos.c&&v===pos.v?'cur':''}" data-b="${b}" data-c="${c}" data-v="${v}">${l}</button>`}
-  return `<div class="vhead"><button class="vback" data-chback aria-label="Chọn đoạn khác"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Đoạn</button><b>Đoạn ${c+1}</b><span>Chọn câu</span></div><div class="grid">${h}</div>`}
+  return `<div class="vhead"><button class="vback" data-chback aria-label="Chọn chương khác"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Chương</button><b>Chương ${c+1}</b><span>Chọn đoạn</span></div><div class="grid">${h}</div>`}
 function renderToc(){
   $$('#pToc .tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tocTab));
   if(tocTab==='books'){
@@ -581,7 +581,7 @@ function renderMarks(){
     (g.length?g.map(x=>{const t=B[x.b][2][x.c].slice(x.v1-1,x.v2).map((s,i)=>s?`<sup>${vlabel(x.b,x.c,x.v1+i)}</sup>${esc(s)}`:'').join(' ');
       return `<button class="mk" data-b="${x.b}" data-c="${x.c}" data-v="${x.v1}"><span class="mkH"><i class="cdot" style="background:${MC[x.col]?MC[x.col][0]:'transparent'};${MC[x.col]?'':'border:1px solid var(--mute)'}"></i><b>${esc(ref(x.b,x.c,x.v1===x.v2?x.v1:x.v1+'–'+x.v2))}</b><small>${dmy(x.t)}</small></span>`+
         `<span class="mkT">${t}</span>${x.n?`<span class="mkN">✎ ${esc(x.n)}</span>`:''}</button>`}).join('')
-     :'<div class="empty">'+(all?'Không có câu nào khớp bộ lọc':'Chưa có câu nào được tô màu hoặc ghi chú.<br>Chạm vào một câu khi đang đọc để đánh dấu.')+'</div>');
+     :'<div class="empty">'+(all?'Không có đoạn nào khớp bộ lọc':'Chưa có đoạn nào được tô màu hoặc ghi chú.<br>Chạm vào một đoạn khi đang đọc để đánh dấu.')+'</div>');
 }
 function openToc(tab){closeAll();tocTab=tab||'books';openBook=pos.b;openCh=null;renderToc();$('#pToc').classList.add('on');
   if(tocTab==='books')requestAnimationFrame(()=>{const r=$('#tocBody .bkRow.cur');if(r)r.scrollIntoView({block:'start'})})}
@@ -638,7 +638,7 @@ function doSearch(save){
   res.sort((x,y)=>x[0]-y[0]);
   if(save){searches=[q,...searches.filter(x=>x!==q)].slice(0,15);store.set('searches',searches)}
   const nPh=res.filter(r=>r[0]===0).length, out=res.slice(0,300);
-  $('#sBody').innerHTML=`<div class="sec">${res.length} KẾT QUẢ${words.length>1&&nPh?' · '+nPh+' CÂU CÓ ĐÚNG CỤM TỪ':''}${res.length>300?' · HIỆN 300 ĐẦU':''}</div>`+out.map(([sc,b,c,v,rg])=>{
+  $('#sBody').innerHTML=`<div class="sec">${res.length} KẾT QUẢ${words.length>1&&nPh?' · '+nPh+' ĐOẠN CÓ ĐÚNG CỤM TỪ':''}${res.length>300?' · HIỆN 300 ĐẦU':''}</div>`+out.map(([sc,b,c,v,rg])=>{
     const t=B[b][2][c][v].normalize('NFC'),a=Math.max(0,rg[0][0]-60),z=Math.min(t.length,Math.max(rg[0][1]+100,a+160));
     let h='',pos0=a;for(const [x,y] of rg){if(x<pos0||x>=z)continue;h+=esc(t.slice(pos0,x))+'<mark>'+esc(t.slice(x,Math.min(y,z)))+'</mark>';pos0=Math.min(y,z)}
     h+=esc(t.slice(pos0,z));
@@ -751,7 +751,7 @@ if(RA){
   setTimeout(raSync,1500); // mở lại app khi dịch vụ vẫn đang đọc
 }
 // Câu đầu của chương thì đọc trước: sách mới → "Tên sách, chương 1."; chương khác → "Chương N." (giống ReadAloudService.heading)
-const bookSay=n=>n.replace(/^III /,'Ba ').replace(/^II /,'Hai ').replace(/^I /,'Một ');
+const bookSay=n=>{const m=n.match(/^(I{1,3}) (.+)$/);return m?'Sách '+m[2]+' thứ '+['nhất','hai','ba'][m[1].length-1]:n};
 function heading(b,c,v){const fv=B[b][2][c].findIndex(x=>x)+1;if(v!==fv)return '';
   return c===0?bookSay(B[b][0])+', chương 1. ':'Chương '+(c+1)+'. '}
 function sayNext(){
@@ -793,7 +793,7 @@ $('#bExport').onclick=async()=>{
 $('#bImport').onclick=()=>$('#fImport').click();
 $('#fImport').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
   try{const d=JSON.parse(await f.text());if(d.app!=='kinh-thanh-1925')throw new Error('Không phải file sao lưu của app này');
-    const n=mergeIn(d,false);closeSheets();refreshPages();syncSoon();toast('Đã nhập: '+n+' câu tô màu/ghi chú thay đổi');
+    const n=mergeIn(d,false);closeSheets();refreshPages();syncSoon();toast('Đã nhập: '+n+' đoạn tô màu/ghi chú thay đổi');
   }catch(err){toast('File không hợp lệ: '+err.message)}};
 
 /* ---------- Đồng bộ Google Drive (giai đoạn 2) ----------
@@ -975,7 +975,7 @@ async function renderAbout(){
       <dt>Phát triển</dt><dd>David<br><small>Viết mã cùng trợ lý AI Claude (Anthropic)</small></dd>
       <dt>Văn bản</dt><dd>Kinh Thánh bản Truyền Thống 1925 (Vietnamese Bible 1925)<br><small>Thánh Kinh Hội (Bible Society Vietnam). Thuộc phạm vi công cộng. Dữ liệu lấy từ YouVersion (bible.com), mã bản dịch VIE1925.</small></dd>
       <dt>Phông chữ</dt><dd>Literata, Noto Serif, Lora và Be Vietnam Pro<br><small>Giấy phép SIL Open Font License</small></dd>
-      <dt>Dữ liệu của bạn</dt><dd>${nHl} câu đã tô màu/ghi chú, ${hist.length} chương trong lịch sử đọc.<br><small>${NATIVE?'Lưu trên máy; có thể đồng bộ Google Drive trong Cài đặt.':'Lưu trên máy; đăng nhập tài khoản trong Cài đặt để lưu lên mạng.'}</small></dd>
+      <dt>Dữ liệu của bạn</dt><dd>${nHl} đoạn đã tô màu/ghi chú, ${hist.length} chương trong lịch sử đọc.<br><small>${NATIVE?'Lưu trên máy; có thể đồng bộ Google Drive trong Cài đặt.':'Lưu trên máy; đăng nhập tài khoản trong Cài đặt để lưu lên mạng.'}</small></dd>
       <dt>Tính năng</dt><dd><small>Lật trang cong giấy · tô 4 màu và ghi chú · tìm kiếm có dấu/không dấu · đọc thành tiếng (chạy nền trên Android) · 3 nền màu · lịch sử đọc · sao lưu, đồng bộ.</small></dd>
     </dl></div>`;
 }
@@ -983,7 +983,7 @@ const WEB_UPDATED='23/11/2026';
 
 /* ---------- Nút Back của Android ---------- */
 if(AppP)AppP.addListener('backButton',()=>{
-  if($('#pToc').classList.contains('on')&&tocTab==='books'&&openCh!==null){openCh=null;renderToc();return} // đang chọn câu: lùi về chọn đoạn
+  if($('#pToc').classList.contains('on')&&tocTab==='books'&&openCh!==null){openCh=null;renderToc();return} // đang chọn đoạn: lùi về chọn chương
   if($('.panel.on')){closeAll();return}
   if(sel.size){clearSel();return}
   if($('.sheet.on')){closeSheets();return}
@@ -1043,7 +1043,7 @@ fetch('vie1925.json').then(r=>r.json()).then(d=>{
   B=d;B.forEach((bk,b)=>bk[2].forEach((_,c)=>chList.push([b,c])));
   if(!B[pos.b]||!B[pos.b][2][pos.c])pos={b:39,c:4,v:1};
   $('#loading').remove();
-  const ready=()=>{build(pos.b,pos.c,{v:pos.v});if(drive.on)setTimeout(()=>syncNow(false),800);if(acct.uid)setTimeout(()=>acctSync(false,'boot'),800);if(!store.get('hint2',0)){setTimeout(()=>toast('Vuốt ngang để lật trang · Chạm vào câu để chọn · Chạm thanh dưới để mở menu'),400);store.set('hint2',1)}};
+  const ready=()=>{build(pos.b,pos.c,{v:pos.v});if(drive.on)setTimeout(()=>syncNow(false),800);if(acct.uid)setTimeout(()=>acctSync(false,'boot'),800);if(!store.get('hint2',0)){setTimeout(()=>toast('Vuốt ngang để lật trang · Chạm vào đoạn để chọn · Chạm thanh dưới để mở menu'),400);store.set('hint2',1)}};
   (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(ready);
 }).catch(()=>{$('#loading').textContent='Không tải được dữ liệu Kinh Thánh.'});
 }
